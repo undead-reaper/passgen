@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { generatePasswords } from "@/stores/PasswordStore";
 import { Copy, Loader2 } from "lucide-react";
-import { memo, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const PasswordGenerator = () => {
@@ -38,7 +38,7 @@ const PasswordGenerator = () => {
     });
   }
 
-  useMemo(() => {
+  useEffect(() => {
     if (data && data.passwords) {
       setPasswords(data.passwords);
       const password1 = data.passwords[0];
@@ -50,28 +50,20 @@ const PasswordGenerator = () => {
         password2Ref.current.value = password2;
       }
     }
-  }, [isLoading]);
+  }, [data]);
 
   async function handleGeneratePassword() {
-    await mutate()
-      .then((data) => {
-        if (data && data.passwords) {
-          setPasswords(data.passwords);
-          const password1 = data.passwords[0];
-          const password2 = data.passwords[1];
-          if (password1Ref.current) {
-            password1Ref.current.value = password1;
-          }
-          if (password2Ref.current) {
-            password2Ref.current.value = password2;
-          }
-        }
-      })
-      .finally(() => {
+    await mutate().then(() => {
+      if (!error) {
         toast("Password Generated", {
           description: "Two new passwords have been generated.",
         });
-      });
+      } else {
+        toast.error("Error generating passwords", {
+          description: error.message,
+        });
+      }
+    });
   }
 
   function copyToClipboard({

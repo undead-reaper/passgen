@@ -1,7 +1,7 @@
 import { parseUrl } from "next/dist/shared/lib/router/utils/parse-url";
-import useSWR, { SWRResponse } from "swr";
+import useSWR, { Fetcher, SWRResponse } from "swr";
 
-const fetcher = async (url: string) => {
+const fetcher: Fetcher<APIResponse> = async (url: string) => {
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -18,7 +18,7 @@ export function generatePasswords({
   includeSymbols = true,
   includeNumbers = true,
   count = 2,
-}: PasswordQuery): SWRResponse {
+}: PasswordQuery): SWRResponse<APIResponse> {
   const params = new URLSearchParams({
     length: length.toString(),
     symbols: includeSymbols.toString(),
@@ -28,21 +28,9 @@ export function generatePasswords({
 
   const uri = parseUrl(`/api/generate?${params.toString()}`);
 
-  const { data, error, isLoading, mutate, isValidating } = useSWR(
-    uri.href,
-    fetcher,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-      refreshInterval: 0,
-    }
-  );
-  const response: SWRResponse = {
-    data,
-    error,
-    isLoading,
-    mutate,
-    isValidating,
-  };
-  return response;
+  return useSWR(uri.href, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+    refreshInterval: 0,
+  });
 }
