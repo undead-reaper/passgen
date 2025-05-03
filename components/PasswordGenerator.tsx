@@ -73,7 +73,7 @@ const PasswordGenerator = () => {
     password: string;
     index: number;
   }) {
-    navigator.clipboard.writeText(password).then((_) => {
+    navigator.clipboard.writeText(password).then(() => {
       toast("Copied to clipboard", {
         description: `Password ${index + 1} copied to clipboard`,
       });
