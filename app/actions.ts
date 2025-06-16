@@ -53,7 +53,7 @@ export async function generatePasswords(
       includeNumbers,
     });
     return { passwords: [passwordOne, passwordTwo] };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error generating passwords:", error);
     return {
       error: "Failed to generate passwords",
